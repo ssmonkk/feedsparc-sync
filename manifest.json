@@ -1,0 +1,9 @@
+{
+  "id": "rssagent-sync",
+  "name": "RSSAgent Sync",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Pulls queued articles from your RSSAgent account into the vault as Markdown notes, upserted by their stable source id.",
+  "author": "RSSAgent",
+  "isDesktopOnly": false
+}

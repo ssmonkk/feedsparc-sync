@@ -1,0 +1,19 @@
+{
+  "name": "rssagent-sync",
+  "version": "0.1.0",
+  "description": "Obsidian plugin that pulls queued RSSAgent articles into the vault.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "bun run esbuild.config.mjs",
+    "dev": "bun run esbuild.config.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "esbuild": "^0.25.0",
+    "obsidian": "^1.7.2",
+    "typescript": "^5.7.2"
+  }
+}
