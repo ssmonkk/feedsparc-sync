@@ -1,4 +1,4 @@
-import { ApiError, describeError, PENDING_LIMIT, RSSAgentApi } from "./api";
+import { describeError, PENDING_LIMIT, RSSAgentApi } from "./api";
 import type { PendingItem, PendingResponse } from "./model";
 import { NoteUpserter, type NoteRepository, type SourceMap } from "./notes";
 import type { RSSAgentSettings } from "./settings";
