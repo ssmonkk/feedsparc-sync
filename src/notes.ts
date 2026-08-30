@@ -1,5 +1,5 @@
 /**
- * Idempotent note upsert keyed on the RSSAgent `sourceId`.
+ * Idempotent note upsert keyed on the FeedSparc `sourceId`.
  *
  * The vault is reached only through {@link NoteRepository}, so the resolution
  * order below is exercised by unit tests without an Obsidian runtime.

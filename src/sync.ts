@@ -1,7 +1,7 @@
-import { describeError, PENDING_LIMIT, RSSAgentApi } from "./api";
+import { describeError, PENDING_LIMIT, FeedSparcApi } from "./api";
 import type { PendingItem, PendingResponse } from "./model";
 import { NoteUpserter, type NoteRepository, type SourceMap } from "./notes";
-import type { RSSAgentSettings } from "./settings";
+import type { FeedSparcSettings } from "./settings";
 import {
   assembleNote,
   buildTemplateSource,
@@ -12,7 +12,7 @@ import {
 
 /** What the sync engine needs from the plugin instance. */
 export interface SyncHost {
-  readonly settings: RSSAgentSettings;
+  readonly settings: FeedSparcSettings;
   readonly sourceMap: SourceMap;
   /** Writes settings and the source map back to plugin data. */
   persist(): Promise<void>;
@@ -57,7 +57,7 @@ export class SyncEngine {
   /** Returns null when the run was skipped because one was already in flight. */
   async run(options: SyncOptions): Promise<SyncSummary | null> {
     if (this.running) {
-      if (!options.silent) this.host.notify("RSSAgent: 同期はすでに実行中です。");
+      if (!options.silent) this.host.notify("FeedSparc: 同期はすでに実行中です。");
       return null;
     }
     this.running = true;
@@ -79,14 +79,14 @@ export class SyncEngine {
       malformed: 0,
     };
 
-    const api = new RSSAgentApi({ baseUrl: settings.baseUrl, token: settings.token });
+    const api = new FeedSparcApi({ baseUrl: settings.baseUrl, token: settings.token });
 
     let pending: PendingResponse;
     try {
       pending = await api.fetchPending(PENDING_LIMIT);
     } catch (error) {
       // Nothing was written, so nothing is acked and the queue is untouched.
-      this.host.notify(`RSSAgent: 取得に失敗しました — ${describeError(error)}`);
+      this.host.notify(`FeedSparc: 取得に失敗しました — ${describeError(error)}`);
       summary.failed = 1;
       return summary;
     }
@@ -95,7 +95,7 @@ export class SyncEngine {
     summary.malformed = pending.malformed;
 
     if (pending.items.length === 0) {
-      if (!options.silent) this.host.notify("RSSAgent: 新しい記事はありません。");
+      if (!options.silent) this.host.notify("FeedSparc: 新しい記事はありません。");
       return summary;
     }
 
@@ -127,7 +127,7 @@ export class SyncEngine {
         // The notes are on disk; leaving the queue entries unacked means the
         // next cycle re-delivers them and the upsert updates the same notes.
         this.host.notify(
-          `RSSAgent: ${written.length}件を保存しましたが、完了通知に失敗しました — ${describeError(error)}`,
+          `FeedSparc: ${written.length}件を保存しましたが、完了通知に失敗しました — ${describeError(error)}`,
         );
         this.logFailures(failures);
         return summary;
@@ -141,7 +141,7 @@ export class SyncEngine {
 
   private async writeNote(
     upserter: NoteUpserter,
-    settings: RSSAgentSettings,
+    settings: FeedSparcSettings,
     item: PendingItem,
   ): Promise<"created" | "updated" | "adopted"> {
     const source = buildTemplateSource(item);
@@ -167,12 +167,12 @@ export class SyncEngine {
     if (summary.failed > 0) parts.push(`失敗 ${summary.failed}件`);
     if (summary.malformed > 0) parts.push(`不正なデータ ${summary.malformed}件`);
     if (parts.length === 0) return;
-    this.host.notify(`RSSAgent: ${parts.join(" / ")}`);
+    this.host.notify(`FeedSparc: ${parts.join(" / ")}`);
   }
 
   private logFailures(failures: string[]): void {
     if (failures.length === 0) return;
     // Failure detail goes to the console; it never contains the token.
-    console.error("[rssagent-sync] 書き込みに失敗した記事:", failures);
+    console.error("[feedsparc-sync] 書き込みに失敗した記事:", failures);
   }
 }

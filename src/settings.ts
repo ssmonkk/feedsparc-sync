@@ -1,10 +1,10 @@
 import { App, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
-import { RSSAgentApi } from "./api";
+import { FeedSparcApi } from "./api";
 import { isRecord, readString } from "./json";
 import type { SourceMap } from "./notes";
 import { DEFAULT_BODY_TEMPLATE, DEFAULT_FILENAME_TEMPLATE, DEFAULT_FRONTMATTER_TEMPLATE, TEMPLATE_VARIABLES } from "./template";
 
-export interface RSSAgentSettings {
+export interface FeedSparcSettings {
   baseUrl: string;
   token: string;
   folder: string;
@@ -14,10 +14,10 @@ export interface RSSAgentSettings {
   bodyTemplate: string;
 }
 
-export const DEFAULT_SETTINGS: RSSAgentSettings = {
+export const DEFAULT_SETTINGS: FeedSparcSettings = {
   baseUrl: "",
   token: "",
-  folder: "RSSAgent",
+  folder: "FeedSparc",
   intervalMinutes: 60,
   fileNameTemplate: DEFAULT_FILENAME_TEMPLATE,
   frontmatterTemplate: DEFAULT_FRONTMATTER_TEMPLATE,
@@ -25,7 +25,7 @@ export const DEFAULT_SETTINGS: RSSAgentSettings = {
 };
 
 export interface PersistedData {
-  settings: RSSAgentSettings;
+  settings: FeedSparcSettings;
   sourceMap: SourceMap;
 }
 
@@ -67,12 +67,12 @@ export function parsePersistedData(payload: unknown): PersistedData {
 }
 /** The plugin interface needed to trigger interval re-registration. */
 export interface SettingsHost {
-  settings: RSSAgentSettings;
+  settings: FeedSparcSettings;
   persist(): Promise<void>;
   applyInterval(): void;
 }
 
-export class RSSAgentSettingTab extends PluginSettingTab {
+export class FeedSparcSettingTab extends PluginSettingTab {
   private readonly host: SettingsHost;
 
   constructor(app: App, host: SettingsHost) {
@@ -88,7 +88,7 @@ export class RSSAgentSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("API Base URL")
-      .setDesc("RSSAgent がホストされている URL（例: https://rss.example.com）")
+      .setDesc("FeedSparc がホストされている URL（例: https://feedsparc.com）")
       .addText(text => text
         .setPlaceholder("https://")
         .setValue(s.baseUrl)
@@ -99,7 +99,7 @@ export class RSSAgentSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("API トークン")
-      .setDesc("RSSAgent の設定画面で発行したエクスポート用トークン。")
+      .setDesc("FeedSparc の設定画面で発行したエクスポート用トークン。")
       .addText(text => {
         text.inputEl.type = "password";
         text
@@ -117,7 +117,7 @@ export class RSSAgentSettingTab extends PluginSettingTab {
       testButton.disabled = true;
       testButton.textContent = "テスト中...";
       try {
-        const api = new RSSAgentApi({ baseUrl: s.baseUrl, token: s.token });
+        const api = new FeedSparcApi({ baseUrl: s.baseUrl, token: s.token });
         const count = await api.testConnection();
         new Notice(`接続成功！待機中の記事: ${count}件`);
       } catch (error) {

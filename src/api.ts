@@ -28,12 +28,12 @@ export interface ApiCredentials {
 }
 
 /**
- * Thin client over the RSSAgent export endpoints. Uses Obsidian's `requestUrl`
+ * Thin client over the FeedSparc export endpoints. Uses Obsidian's `requestUrl`
  * rather than `fetch` so requests are not subject to the renderer's CORS rules.
  * The token only ever leaves this class inside an Authorization header — it is
  * never interpolated into a message, URL or log line.
  */
-export class RSSAgentApi {
+export class FeedSparcApi {
   private readonly baseUrl: string;
   private readonly token: string;
 

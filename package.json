@@ -1,14 +1,12 @@
 {
-  "name": "rssagent-sync",
+  "name": "feedsparc-sync",
   "version": "0.1.0",
-  "description": "Obsidian plugin that pulls queued RSSAgent articles into the vault.",
+  "description": "Obsidian plugin that pulls queued FeedSparc articles into the vault.",
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun run esbuild.config.mjs",
     "dev": "bun run esbuild.config.mjs --watch",
-    "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "build": "bun run esbuild.config.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

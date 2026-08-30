@@ -1,10 +1,10 @@
 import { Notice, Plugin } from "obsidian";
 import { VaultNoteRepository } from "./vault-repository";
 import { SyncEngine } from "./sync";
-import { parsePersistedData, RSSAgentSettingTab, type PersistedData } from "./settings";
+import { parsePersistedData, FeedSparcSettingTab, type PersistedData } from "./settings";
 import { DEFAULT_SETTINGS } from "./settings";
 
-export default class RSSAgentPlugin extends Plugin {
+export default class FeedSparcPlugin extends Plugin {
   private data: PersistedData = {
     settings: { ...DEFAULT_SETTINGS },
     sourceMap: {},
@@ -25,7 +25,7 @@ export default class RSSAgentPlugin extends Plugin {
     });
 
     this.addSettingTab(
-      new RSSAgentSettingTab(this.app, {
+      new FeedSparcSettingTab(this.app, {
         settings: this.data.settings,
         persist: async () => await this.saveData(this.data),
         applyInterval: () => this.applyInterval(),
@@ -33,7 +33,7 @@ export default class RSSAgentPlugin extends Plugin {
     );
 
     this.addCommand({
-      id: "rssagent-sync-now",
+      id: "feedsparc-sync-now",
       name: "Sync now",
       callback: () => {
         // Errors are surfaced as Notices inside the engine.
