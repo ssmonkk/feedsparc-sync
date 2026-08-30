@@ -14,7 +14,7 @@ An Obsidian plugin that connects to your FeedSparc account and pulls queued arti
 
 1. Install the [BRAT plugin](https://github.com/TfTHacker/obsidian42-brat) in Obsidian.
 2. In BRAT settings, click **Add beta plugin**.
-3. Enter this repository's URL: `https://github.com/ssmonkk/rssagent`
+3. Enter this repository's URL: `https://github.com/ssmonkk/feedsparc`
 4. Enable the plugin in **Community plugins**.
 
 ## Configuration
