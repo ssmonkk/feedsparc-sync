@@ -25,7 +25,7 @@ export default class FeedSparcPlugin extends Plugin {
     });
 
     this.addSettingTab(
-      new FeedSparcSettingTab(this.app, {
+      new FeedSparcSettingTab(this.app, this, {
         settings: this.data.settings,
         persist: async () => await this.saveData(this.data),
         applyInterval: () => this.applyInterval(),

@@ -4,7 +4,7 @@
     "lib": ["ES2020", "DOM"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["node"],
+    "types": ["node", "bun-types"],
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,

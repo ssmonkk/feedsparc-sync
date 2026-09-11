@@ -75,8 +75,8 @@ export interface SettingsHost {
 export class FeedSparcSettingTab extends PluginSettingTab {
   private readonly host: SettingsHost;
 
-  constructor(app: App, host: SettingsHost) {
-    super(app, host as unknown as Plugin);
+  constructor(app: App, plugin: Plugin, host: SettingsHost) {
+    super(app, plugin);
     this.host = host;
   }
 

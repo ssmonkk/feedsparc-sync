@@ -6,10 +6,12 @@
   "private": true,
   "scripts": {
     "dev": "bun run esbuild.config.mjs --watch",
-    "build": "bun run esbuild.config.mjs"
+    "build": "bun run esbuild.config.mjs",
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "bun-types": "^1.4.2",
     "esbuild": "^0.25.0",
     "obsidian": "^1.7.2",
     "typescript": "^5.7.2"
