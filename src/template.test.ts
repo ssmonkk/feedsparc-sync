@@ -104,6 +104,16 @@ describe("buildTemplateSource", () => {
     expect(source.summary).toBe("");
     expect(source.body).toBe("");
   });
+
+  it("collapses newlines in title and url into spaces", () => {
+    const source = buildTemplateSource({
+      ...baseItem,
+      title: "Line one\nLine two\r\nLine three",
+      url: "https://example.com/a\nb",
+    });
+    expect(source.title).toBe("Line one Line two Line three");
+    expect(source.url).toBe("https://example.com/a b");
+  });
 });
 
 describe("renderFileName", () => {
@@ -152,9 +162,29 @@ describe("renderBody", () => {
     expect(renderBody("{{tags}}", source)).toBe("ai, reading");
   });
 
-  it("inlines values verbatim without YAML escaping", () => {
+  it("inlines values verbatim when they carry no Markdown-special characters", () => {
     const source = buildTemplateSource({ ...baseItem, summary: 'Has "quotes" and: colons' });
     expect(renderBody("{{summary}}", source)).toBe('Has "quotes" and: colons');
+  });
+
+  it("escapes HTML/Templater angle brackets", () => {
+    const source = buildTemplateSource({ ...baseItem, summary: "<%* tp.file.create_new() %>" });
+    expect(renderBody("{{summary}}", source)).toBe("&lt;%* tp.file.create_new() %&gt;");
+  });
+
+  it("escapes a code fence so DataviewJS cannot execute", () => {
+    const source = buildTemplateSource({ ...baseItem, body: "```dataviewjs\n`$=1+1`\n```" });
+    expect(renderBody("{{body}}", source)).toBe("\\`\\`\\`dataviewjs\n\\`$=1+1\\`\n\\`\\`\\`");
+  });
+
+  it("escapes image embeds and wikilinks via the leading bracket", () => {
+    const source = buildTemplateSource({
+      ...baseItem,
+      title: "![tracker](https://evil.test/t.png) [[Private Note]]",
+    });
+    expect(renderBody("{{title}}", source)).toBe(
+      "!\\[tracker](https://evil.test/t.png) \\[\\[Private Note]]",
+    );
   });
 });
 

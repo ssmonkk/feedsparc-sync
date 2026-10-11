@@ -19,10 +19,14 @@ An Obsidian plugin that connects to your FeedSparc account and pulls queued arti
 
 ## Configuration
 
-1. **API Base URL:** The root URL of your FeedSparc instance (e.g. `https://feedsparc.com`).
+1. **API Base URL:** The root URL of your FeedSparc instance (e.g. `https://feedsparc.com`). Must be `https://`; `http://` is only accepted for `localhost`/`127.0.0.1` (local development), since the API token is sent as a bearer header.
 2. **API Token:** Generate an export token in FeedSparc's settings menu (`/settings`) and paste it here.
 3. Click **Test connection** to confirm it works.
 4. Set a destination folder for your notes (leave blank for the vault root).
+
+> **Security notes**
+> - The token is stored in plaintext in this plugin's `data.json`, inside your vault (`.obsidian/plugins/feedsparc-sync/data.json`). If you version-control your vault, add that path to your vault's `.gitignore`.
+> - Article title, URL, summary, and body come from feeds you subscribed to in FeedSparc, which may be written by someone else. The plugin escapes Markdown syntax (code fences, `` `$= `` DataviewJS queries, `![` image embeds, `[[` wikilinks, `<%` Templater tags) before writing a note, but if you've customized the templates below to not use `{{title}}`/`{{body}}`/etc. through `renderBody`, or you open delivered notes in another Markdown tool, that tool's own protections apply instead.
 
 ## Template Variables
 

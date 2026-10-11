@@ -28,6 +28,23 @@ export interface ApiCredentials {
 }
 
 /**
+ * Accepts https origins unconditionally; http is only allowed for localhost
+ * and 127.0.0.1, where a plaintext loopback connection cannot be intercepted
+ * off-box and local development needs it. The token is a bearer credential,
+ * so any other http origin would otherwise send it in the clear.
+ */
+export function isAllowedBaseUrl(baseUrl: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(baseUrl);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol === "https:") return true;
+  return parsed.protocol === "http:" && (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1");
+}
+
+/**
  * Thin client over the FeedSparc export endpoints. Uses Obsidian's `requestUrl`
  * rather than `fetch` so requests are not subject to the renderer's CORS rules.
  * The token only ever leaves this class inside an Authorization header — it is
@@ -62,6 +79,9 @@ export class FeedSparcApi {
   private async send(path: string, method: "GET" | "POST", body?: unknown): Promise<unknown> {
     if (this.baseUrl.length === 0) throw new ApiError("API の URL が設定されていません。", null);
     if (this.token.length === 0) throw new ApiError("API トークンが設定されていません。", null);
+    if (!isAllowedBaseUrl(this.baseUrl)) {
+      throw new ApiError("API の URL には https を使用してください（localhost を除く）。", null);
+    }
 
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.token}`,

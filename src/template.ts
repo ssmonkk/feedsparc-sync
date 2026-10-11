@@ -65,6 +65,33 @@ const ISO_DATE_PREFIX = /^(\d{4}-\d{2}-\d{2})/;
 const SOURCE_ID_LINE = /^source_id\s*:/;
 
 /**
+ * Neutralizes Markdown/Templater syntax a feed item could smuggle into a note:
+ * `<`/`>` (also breaks Templater's `<%...%>`), backticks (also breaks code
+ * fences and DataviewJS's `` `$= `` inline queries), and `[` (also breaks
+ * `![...]` image embeds and `[[...]]` wikilinks, since CommonMark only treats
+ * those specially when the leading `[` is unescaped).
+ */
+function escapeMarkdown(value: string): string {
+  return value.replace(/[<>`[]/g, (char) => {
+    switch (char) {
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case "`":
+        return "\\`";
+      default:
+        return "\\[";
+    }
+  });
+}
+
+/** A newline in title/url would otherwise split a rendered note mid-line. */
+function stripNewlines(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
+/**
  * Substitutes `{{name}}` placeholders. Unknown names are left verbatim so a
  * typo in a user template is visible in the note instead of silently vanishing.
  */
@@ -134,8 +161,8 @@ export function formatDate(publishedAt: string): string {
 export function buildTemplateSource(item: PendingItem): TemplateSource {
   return {
     sourceId: item.sourceId,
-    title: item.title ?? "",
-    url: item.url,
+    title: stripNewlines(item.title ?? ""),
+    url: stripNewlines(item.url),
     publishedAt: item.publishedAt,
     feedTitle: item.feedTitle ?? "",
     summary: item.summary ?? "",
@@ -198,11 +225,13 @@ export function renderFrontmatter(template: string, source: TemplateSource): str
   return body.length > 0 ? `${sourceIdLine}\n${body}` : sourceIdLine;
 }
 
-/** Body layer: values inlined verbatim, since Markdown needs no escaping. */
+/** Body layer: every value Markdown-escaped, since it is embedded verbatim into the note. */
 export function renderBody(template: string, source: TemplateSource): string {
-  return substitute(template, (name) =>
-    name === "tags" ? source.tags.join(", ") : plainValue(source, name),
-  );
+  return substitute(template, (name) => {
+    if (name === "tags") return source.tags.map(escapeMarkdown).join(", ");
+    const value = plainValue(source, name);
+    return value === null ? null : escapeMarkdown(value);
+  });
 }
 
 export function assembleNote(frontmatter: string, body: string): string {
